@@ -1,0 +1,33 @@
+{
+    "name": "ts-serverless-starter",
+    "version": "0.0.1",
+    "private": true,
+    "description": "TypeScript Serverless Starter with Turborepo, Hono, Next.js, and AWS CDK",
+    "scripts": {
+        "build": "turbo run build",
+        "dev": "turbo run dev",
+        "lint": "biome lint .",
+        "lint:fix": "biome lint --write .",
+        "format": "biome format --write .",
+        "format:check": "biome format .",
+        "check": "biome check .",
+        "check:fix": "biome check --write .",
+        "test": "turbo run test",
+        "typecheck": "turbo run typecheck",
+        "clean": "turbo run clean && rm -rf node_modules",
+        "db:generate": "dotenv -- turbo run db:generate --filter=@repo/db",
+        "db:migrate": "dotenv -- turbo run db:migrate --filter=@repo/db",
+        "db:push": "dotenv -- turbo run db:push --filter=@repo/db",
+        "db:studio": "dotenv -- turbo run db:studio --filter=@repo/db"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.3.10",
+        "dotenv-cli": "^11.0.0",
+        "turbo": "^2.3.3",
+        "typescript": "^5.7.2"
+    },
+    "packageManager": "pnpm@9.15.1",
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

@@ -1,0 +1,47 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.next
+.open-next
+cdk.out
+*.js
+*.d.ts
+*.js.map
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test
+coverage
+
+# Turbo
+.turbo
+
+# PandaCSS
+styled-system
+
+# CDK
+cdk.context.json
+
+# Drizzle (meta is auto-generated, but migrations should be committed)
+# packages/db/drizzle/ contains migration files - DO NOT ignore

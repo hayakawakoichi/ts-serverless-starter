@@ -1,0 +1,27 @@
+{
+    "name": "@repo/infra",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "cdk": "cdk",
+        "synth": "cdk synth",
+        "deploy": "cdk deploy",
+        "diff": "cdk diff",
+        "destroy": "cdk destroy",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "aws-cdk-lib": "^2.174.1",
+        "cdk-nextjs-standalone": "^4.3.3",
+        "constructs": "^10.4.2"
+    },
+    "devDependencies": {
+        "@repo/tsconfig": "workspace:*",
+        "@types/node": "^22.10.2",
+        "aws-cdk": "^2.174.1",
+        "tsx": "^4.19.2",
+        "typescript": "^5.7.2"
+    }
+}

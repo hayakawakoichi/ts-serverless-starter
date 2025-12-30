@@ -1,0 +1,37 @@
+{
+    "name": "@repo/db",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        },
+        "./schema": {
+            "types": "./src/schema/index.ts",
+            "default": "./src/schema/index.ts"
+        },
+        "./auth": {
+            "types": "./src/lib/auth.ts",
+            "default": "./src/lib/auth.ts"
+        }
+    },
+    "scripts": {
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate",
+        "db:push": "drizzle-kit push",
+        "db:studio": "drizzle-kit studio",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@neondatabase/serverless": "^0.10.4",
+        "better-auth": "^1.4.9",
+        "drizzle-orm": "^0.45.1"
+    },
+    "devDependencies": {
+        "@repo/tsconfig": "workspace:*",
+        "drizzle-kit": "^0.31.8",
+        "typescript": "^5.7.2"
+    }
+}
