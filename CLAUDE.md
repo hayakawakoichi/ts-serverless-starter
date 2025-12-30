@@ -44,7 +44,7 @@ This is a **Lambdalith** monorepo using pnpm workspaces + Turborepo.
 ts-serverless-starter/
 ├── apps/
 │   ├── api/          # Hono Lambdalith API
-│   └── web/          # Next.js frontend (App Router)
+│   └── web/          # Next.js 16 frontend (App Router, Turbopack)
 ├── packages/
 │   ├── db/           # Drizzle ORM + Neon
 │   ├── core/         # Shared utilities
