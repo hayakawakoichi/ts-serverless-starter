@@ -168,7 +168,7 @@ export default function Home() {
                         })}
                     />
                     <span className={css({ color: "subtle" })}>$</span>
-                    <span className={css({ color: "neonCyan" })}>npx create-ts-serverless</span>
+                    <span className={css({ color: "neonCyan" })}>npx degit hayakawakoichi/ts-serverless-starter my-app</span>
                 </div>
 
                 {/* Main heading */}
@@ -215,7 +215,7 @@ export default function Home() {
                     })}
                 >
                     <a
-                        href="https://github.com"
+                        href="https://github.com/hayakawakoichi/ts-serverless-starter"
                         className={css({
                             display: "inline-flex",
                             alignItems: "center",
