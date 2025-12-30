@@ -5,7 +5,12 @@ import { HTTPException } from "hono/http-exception"
 import { logger } from "hono/logger"
 import { AppError } from "./lib/errors"
 import { openApiSpec } from "./lib/openapi"
-import { type AuthVariables, authMiddleware, requireAuth, requireDocsAccess } from "./middleware/auth"
+import {
+    type AuthVariables,
+    authMiddleware,
+    requireAuth,
+    requireDocsAccess,
+} from "./middleware/auth"
 import { healthRoutes } from "./routes/health"
 import { meRoutes } from "./routes/me"
 import { userRoutes } from "./routes/users"
