@@ -33,6 +33,7 @@ export class NextjsStack extends Stack {
             nextjsPath: path.join(__dirname, "../../apps/web"),
             buildCommand: "pnpm build:open-next",
             environment: {
+                NODE_ENV: "production",
                 DATABASE_URL: `{{resolve:secretsmanager:${config.dbSecretName}}}`,
                 BETTER_AUTH_SECRET: `{{resolve:secretsmanager:${config.authSecretName}}}`,
                 BETTER_AUTH_URL: config.siteUrl,
