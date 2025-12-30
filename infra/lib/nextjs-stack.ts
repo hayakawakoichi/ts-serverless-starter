@@ -23,18 +23,18 @@ export class NextjsStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props)
 
-        // Reference secrets by name (AWS will resolve the full ARN)
+        // Reference secrets by name for granting permissions
         const dbSecret = Secret.fromSecretNameV2(this, "DatabaseSecret", config.dbSecretName)
         const authSecret = Secret.fromSecretNameV2(this, "AuthSecret", config.authSecretName)
 
         // Next.js deployment using OpenNext
-        // Use CloudFormation dynamic references for secret values
+        // Use CloudFormation dynamic references for secret values (resolved at deploy time)
         const nextjs = new Nextjs(this, "NextjsSite", {
             nextjsPath: path.join(__dirname, "../../apps/web"),
             buildCommand: "pnpm build:open-next",
             environment: {
-                DATABASE_URL: dbSecret.secretValue.unsafeUnwrap(),
-                BETTER_AUTH_SECRET: authSecret.secretValue.unsafeUnwrap(),
+                DATABASE_URL: `{{resolve:secretsmanager:${config.dbSecretName}}}`,
+                BETTER_AUTH_SECRET: `{{resolve:secretsmanager:${config.authSecretName}}}`,
                 BETTER_AUTH_URL: config.siteUrl,
                 NEXT_PUBLIC_APP_URL: config.siteUrl,
                 ...(config.docsAllowedEmails && { DOCS_ALLOWED_EMAILS: config.docsAllowedEmails }),
