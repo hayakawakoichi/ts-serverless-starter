@@ -168,7 +168,9 @@ export default function Home() {
                         })}
                     />
                     <span className={css({ color: "subtle" })}>$</span>
-                    <span className={css({ color: "neonCyan" })}>npx degit hayakawakoichi/ts-serverless-starter my-app</span>
+                    <span className={css({ color: "neonCyan" })}>
+                        npx degit hayakawakoichi/ts-serverless-starter my-app
+                    </span>
                 </div>
 
                 {/* Main heading */}
