@@ -19,7 +19,7 @@
         "@repo/core": "workspace:*",
         "@repo/db": "workspace:*",
         "better-auth": "^1.4.9",
-        "next": "^15.1.2",
+        "next": "^16.1.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-hook-form": "^7.69.0",
