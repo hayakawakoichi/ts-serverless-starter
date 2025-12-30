@@ -9,7 +9,7 @@ TypeScript で構築するサーバーレス Web アプリケーションのス�
 
 | レイヤー | 技術 |
 |----------|------|
-| **Frontend** | Next.js 15 (App Router) + React 19 + PandaCSS |
+| **Frontend** | Next.js 16 (App Router, Turbopack) + React 19 + PandaCSS |
 | **Backend** | Hono (Next.js API Routes 経由) |
 | **Database** | Neon PostgreSQL + Drizzle ORM |
 | **Auth** | Better Auth (Email/Password) |
