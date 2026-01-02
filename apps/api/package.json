@@ -12,6 +12,9 @@
     "scripts": {
         "dev": "tsx watch src/local.ts",
         "build": "tsup",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
         "typecheck": "tsc --noEmit",
         "clean": "rm -rf dist"
     },
@@ -28,10 +31,13 @@
         "zod": "^4.2.1"
     },
     "devDependencies": {
+        "@repo/testing": "workspace:*",
         "@repo/tsconfig": "workspace:*",
         "@types/node": "^22.10.2",
+        "@vitest/coverage-v8": "^4.0.16",
         "tsup": "^8.3.5",
         "tsx": "^4.19.2",
-        "typescript": "^5.7.2"
+        "typescript": "^5.7.2",
+        "vitest": "^4.0.16"
     }
 }

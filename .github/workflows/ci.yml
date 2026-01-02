@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Lint, Format, Typecheck
+    name: Lint, Format, Typecheck, Test
     runs-on: ubuntu-latest
 
     steps:
@@ -39,3 +39,6 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
