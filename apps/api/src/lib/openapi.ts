@@ -17,21 +17,55 @@ export const openApiSpec: OpenAPIV3.Document = {
         "/users": {
             get: {
                 tags: ["Users"],
-                summary: "Get all users",
+                summary: "Get paginated list of users",
+                parameters: [
+                    {
+                        name: "limit",
+                        in: "query",
+                        schema: { type: "integer", minimum: 1, maximum: 100, default: 20 },
+                        description: "Number of items per page",
+                    },
+                    {
+                        name: "cursor",
+                        in: "query",
+                        schema: { type: "string" },
+                        description: "Cursor for pagination (value from nextCursor)",
+                    },
+                    {
+                        name: "sort",
+                        in: "query",
+                        schema: {
+                            type: "string",
+                            enum: ["id", "name", "email", "createdAt", "updatedAt"],
+                            default: "createdAt",
+                        },
+                        description: "Field to sort by",
+                    },
+                    {
+                        name: "order",
+                        in: "query",
+                        schema: { type: "string", enum: ["asc", "desc"], default: "desc" },
+                        description: "Sort order",
+                    },
+                    {
+                        name: "q",
+                        in: "query",
+                        schema: { type: "string" },
+                        description: "Search query (searches name and email)",
+                    },
+                    {
+                        name: "emailVerified",
+                        in: "query",
+                        schema: { type: "string", enum: ["true", "false"] },
+                        description: "Filter by email verification status",
+                    },
+                ],
                 responses: {
                     "200": {
-                        description: "List of users",
+                        description: "Paginated list of users",
                         content: {
                             "application/json": {
-                                schema: {
-                                    type: "object",
-                                    properties: {
-                                        users: {
-                                            type: "array",
-                                            items: { $ref: "#/components/schemas/User" },
-                                        },
-                                    },
-                                },
+                                schema: { $ref: "#/components/schemas/PaginatedUsers" },
                             },
                         },
                     },
@@ -265,6 +299,25 @@ export const openApiSpec: OpenAPIV3.Document = {
                     code: { type: "string" },
                 },
                 required: ["error"],
+            },
+            PaginatedUsers: {
+                type: "object",
+                properties: {
+                    data: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/User" },
+                    },
+                    nextCursor: {
+                        type: "string",
+                        nullable: true,
+                        description: "Cursor for the next page, null if no more pages",
+                    },
+                    hasMore: {
+                        type: "boolean",
+                        description: "Whether there are more pages available",
+                    },
+                },
+                required: ["data", "nextCursor", "hasMore"],
             },
         },
     },

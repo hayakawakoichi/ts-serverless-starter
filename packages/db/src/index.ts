@@ -10,5 +10,22 @@ export function createDb(databaseUrl: string) {
 export type Database = ReturnType<typeof createDb>
 
 // Re-export drizzle-orm operators for use in repositories
-export { and, eq, gt, gte, isNotNull, isNull, lt, lte, ne, not, or } from "drizzle-orm"
+export {
+    and,
+    asc,
+    desc,
+    eq,
+    gt,
+    gte,
+    ilike,
+    isNotNull,
+    isNull,
+    like,
+    lt,
+    lte,
+    ne,
+    not,
+    or,
+    sql,
+} from "drizzle-orm"
 export * from "./schema"

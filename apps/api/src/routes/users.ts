@@ -1,14 +1,25 @@
 import { zValidator } from "@hono/zod-validator"
 import { Hono } from "hono"
 import { userService } from "../services/user.service"
-import { createUserSchema, updateUserSchema, userIdParamSchema } from "../validators"
+import {
+    createUserSchema,
+    updateUserSchema,
+    userIdParamSchema,
+    usersListQuerySchema,
+} from "../validators"
 
 export const userRoutes = new Hono()
 
-// GET /api/users
-userRoutes.get("/", async (c) => {
-    const users = await userService.getAllUsers()
-    return c.json({ users })
+// GET /api/users - with pagination, filtering, sorting
+userRoutes.get("/", zValidator("query", usersListQuerySchema), async (c) => {
+    const query = c.req.valid("query")
+    const result = await userService.getUsers(query)
+
+    return c.json({
+        data: result.items,
+        nextCursor: result.nextCursor,
+        hasMore: result.hasMore,
+    })
 })
 
 // GET /api/users/:id

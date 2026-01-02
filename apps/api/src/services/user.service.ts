@@ -1,7 +1,8 @@
 import type { AuthUser } from "@repo/db"
+import type { PaginatedResult } from "@repo/core"
 import { ConflictError, NotFoundError } from "../lib/errors"
-import { userRepository } from "../repositories/user.repository"
-import type { CreateUserInput, UpdateUserInput } from "../validators"
+import { userRepository, type UserFindOptions } from "../repositories/user.repository"
+import type { CreateUserInput, UpdateUserInput, UsersListQuery } from "../validators"
 
 export const userService = {
     async getUserById(id: string): Promise<AuthUser> {
@@ -14,6 +15,18 @@ export const userService = {
 
     async getAllUsers(): Promise<AuthUser[]> {
         return userRepository.findAll()
+    },
+
+    async getUsers(query: UsersListQuery): Promise<PaginatedResult<AuthUser>> {
+        const options: UserFindOptions = {
+            limit: query.limit,
+            cursor: query.cursor,
+            sort: query.sort,
+            order: query.order,
+            search: query.q,
+            emailVerified: query.emailVerified,
+        }
+        return userRepository.findPaginated(options)
     },
 
     async createUser(data: CreateUserInput): Promise<AuthUser> {
