@@ -8,5 +8,15 @@ export function generateId(): string {
     return globalThis.crypto.randomUUID()
 }
 
-// Add shared types, constants, and utilities here
-export const APP_NAME = "ts-serverless-starter"
+// Constants
+export { APP_NAME } from "./constants"
+
+// Logger
+export {
+    createLogger,
+    createChildLogger,
+    serializeError,
+    logger,
+    type Logger,
+    type CreateLoggerOptions,
+} from "./logger"

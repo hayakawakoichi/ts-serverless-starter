@@ -1,8 +1,9 @@
+import { serializeError } from "@repo/core"
 import { Scalar } from "@scalar/hono-api-reference"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { HTTPException } from "hono/http-exception"
-import { logger } from "hono/logger"
+import type { PinoLogger } from "hono-pino"
 import { AppError } from "./lib/errors"
 import { openApiSpec } from "./lib/openapi"
 import {
@@ -11,23 +12,39 @@ import {
     requireAuth,
     requireDocsAccess,
 } from "./middleware/auth"
+import { apiLogger, loggerMiddleware } from "./middleware/logger"
 import { healthRoutes } from "./routes/health"
 import { meRoutes } from "./routes/me"
 import { userRoutes } from "./routes/users"
 
-const app = new Hono<{ Variables: AuthVariables }>()
+// アプリケーション変数の型定義
+type AppVariables = AuthVariables & {
+    logger: PinoLogger
+}
+
+const app = new Hono<{ Variables: AppVariables }>()
 
 // Middleware
-app.use("*", logger())
+app.use("*", loggerMiddleware)
 app.use("*", cors())
 app.use("*", authMiddleware)
 
 // Global error handler
 app.onError((err, c) => {
-    console.error("Error:", err)
+    // リクエストコンテキストからロガーを取得（ミドルウェア前のエラーは apiLogger を使用）
+    const logger = c.var.logger ?? apiLogger
 
     // Handle AppError (NotFoundError, ValidationError, etc.)
     if (err instanceof AppError) {
+        // AppError は warn レベル（クライアントエラー）
+        logger.warn(
+            {
+                err: serializeError(err),
+                statusCode: err.statusCode,
+                code: err.code,
+            },
+            `AppError: ${err.message}`
+        )
         return c.json(
             {
                 error: err.message,
@@ -39,6 +56,14 @@ app.onError((err, c) => {
 
     // Handle Hono HTTPException
     if (err instanceof HTTPException) {
+        // HTTPException は warn レベル
+        logger.warn(
+            {
+                err: serializeError(err),
+                statusCode: err.status,
+            },
+            `HTTPException: ${err.message}`
+        )
         return c.json(
             {
                 error: err.message,
@@ -47,7 +72,13 @@ app.onError((err, c) => {
         )
     }
 
-    // Handle unknown errors
+    // Handle unknown errors - これは error レベル（サーバーエラー）
+    logger.error(
+        {
+            err: serializeError(err),
+        },
+        `Unexpected error: ${err instanceof Error ? err.message : "Unknown error"}`
+    )
     return c.json(
         {
             error: "Internal server error",
