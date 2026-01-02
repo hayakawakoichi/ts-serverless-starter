@@ -96,7 +96,8 @@ apps/api/src/
 ├── repositories/         # Data access
 │   └── user.repository.ts
 ├── middleware/
-│   └── auth.ts           # Auth middleware (authMiddleware, requireAuth)
+│   ├── auth.ts           # Auth middleware (authMiddleware, requireAuth)
+│   └── logger.ts         # Pino logger middleware (loggerMiddleware)
 └── lib/
     ├── db.ts             # DB connection singleton
     ├── errors.ts         # Custom errors (NotFoundError, etc.)
@@ -146,6 +147,48 @@ Custom errors in `lib/errors.ts`:
 - `ConflictError` → 409
 
 Global error handler in `index.ts` catches and formats all errors.
+
+### Logging (pino)
+
+Structured logging with [pino](https://github.com/pinojs/pino) for production-ready observability.
+
+**Environment-based output:**
+- **Development**: Pretty-printed with colors via `pino-pretty`
+- **Production**: JSON format for CloudWatch Logs
+
+**Request logging** (via `hono-pino`):
+- Automatic request/response logging
+- Request ID generation and tracking
+- Response time measurement
+
+```typescript
+// Route handler でロガーを使用
+import type { Context } from "hono"
+
+app.get("/api/example", (c) => {
+  const logger = c.var.logger
+  logger.info({ userId: "123" }, "Processing request")
+  return c.json({ success: true })
+})
+```
+
+```typescript
+// @repo/core から直接ロガーを使用
+import { createLogger, logger } from "@repo/core"
+
+// デフォルトロガー
+logger.info("Application started")
+
+// カスタムロガー
+const serviceLogger = createLogger({ name: "my-service" })
+serviceLogger.debug({ data: {} }, "Debug info")
+```
+
+**Log levels**: `trace`, `debug`, `info`, `warn`, `error`, `fatal`
+
+**Environment variables:**
+- `LOG_LEVEL`: Minimum log level (default: `debug` in dev, `info` in prod)
+- `NODE_ENV`: `production` for JSON output
 
 ### API Documentation
 
@@ -488,13 +531,16 @@ z.email({ error: "Invalid email" })
 ```typescript
 // Monorepo packages
 import { createDb, users, eq } from "@repo/db";
-import { formatDate } from "@repo/core";
+import { formatDate, createLogger, logger } from "@repo/core";
 
 // Zod validators (in apps/api)
 import { userIdParamSchema, createUserSchema } from "../validators";
 
 // Auth
 import { auth, getAuth } from "@repo/db/auth";
+
+// Logger (in route handlers)
+const logger = c.var.logger  // hono-pino context logger
 ```
 
 ### TypeScript
