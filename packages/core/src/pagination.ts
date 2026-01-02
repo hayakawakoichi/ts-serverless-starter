@@ -10,6 +10,11 @@ export interface PaginatedResponse<T> {
 }
 
 /**
+ * Sort order type
+ */
+export type SortOrder = "asc" | "desc"
+
+/**
  * Pagination parameters for queries
  */
 export interface PaginationParams {
@@ -18,12 +23,19 @@ export interface PaginationParams {
 }
 
 /**
- * Sort parameters for queries
+ * Sort parameters for queries (generic)
  */
-export interface SortParams {
-    sort: string
-    order: "asc" | "desc"
+export interface SortParams<TSortField extends string = string> {
+    sort: TSortField
+    order: SortOrder
 }
+
+/**
+ * Base find options combining pagination and sorting (generic)
+ */
+export interface BaseFindOptions<TSortField extends string = string>
+    extends PaginationParams,
+        SortParams<TSortField> {}
 
 /**
  * Internal paginated result from repository

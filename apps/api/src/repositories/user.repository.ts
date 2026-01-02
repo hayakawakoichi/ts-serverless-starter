@@ -11,7 +11,7 @@ import {
     or,
     user,
 } from "@repo/db"
-import type { PaginatedResult } from "@repo/core"
+import type { BaseFindOptions, PaginatedResult } from "@repo/core"
 import { getDb } from "../lib/db"
 import type { CreateUserInput, UserSortField } from "../validators"
 
@@ -19,11 +19,7 @@ function generateId(): string {
     return crypto.randomUUID().replace(/-/g, "")
 }
 
-export interface UserFindOptions {
-    limit: number
-    cursor?: string
-    sort: UserSortField
-    order: "asc" | "desc"
+export interface UserFindOptions extends BaseFindOptions<UserSortField> {
     search?: string
     emailVerified?: boolean
 }
