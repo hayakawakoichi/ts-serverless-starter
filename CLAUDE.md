@@ -20,6 +20,10 @@ pnpm typecheck
 # Clean build artifacts
 pnpm clean
 
+# Testing
+pnpm test           # Run all tests
+pnpm test:coverage  # Run tests with coverage report
+
 # Database commands (requires DATABASE_URL in .env)
 pnpm db:generate    # Generate migrations from schema changes
 pnpm db:push        # Push schema directly to DB (dev only)
@@ -48,6 +52,7 @@ ts-serverless-starter/
 ├── packages/
 │   ├── db/           # Drizzle ORM + Neon
 │   ├── core/         # Shared utilities
+│   ├── testing/      # Shared test utilities (Vitest, Testing Library)
 │   └── tsconfig/     # Shared TS configs
 └── infra/            # AWS CDK
 ```
@@ -560,13 +565,119 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 For AWS deployment, store in Secrets Manager.
 
+## Testing (Vitest + Testing Library)
+
+### Overview
+
+Testing infrastructure uses Vitest with monorepo workspace configuration and Testing Library for React components.
+
+### Structure
+
+```
+vitest.workspace.ts           # Monorepo workspace config
+packages/testing/             # Shared test utilities
+├── src/
+│   ├── index.ts              # Common utilities (createSpy, sleep, etc.)
+│   ├── hono.ts               # Hono API test helpers
+│   └── react.tsx             # React Testing Library wrappers
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Run tests in watch mode (per package)
+cd apps/api && pnpm test:watch
+```
+
+### Writing API Tests
+
+```typescript
+import { describe, it, expect, beforeEach } from "vitest"
+import { Hono } from "hono"
+import { healthRoutes } from "./routes/health"
+
+describe("health routes", () => {
+    let app: Hono
+
+    beforeEach(() => {
+        app = new Hono()
+        app.route("/api/health", healthRoutes)
+    })
+
+    it("returns status ok", async () => {
+        const res = await app.request("/api/health")
+
+        expect(res.status).toBe(200)
+
+        const json = await res.json()
+        expect(json.status).toBe("ok")
+    })
+})
+```
+
+### Writing React Component Tests
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from "vitest"
+import { render, screen, fireEvent } from "@testing-library/react"
+import { MyComponent } from "./my-component"
+
+// Mock dependencies
+vi.mock("next/link", () => ({
+    default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+        <a href={href}>{children}</a>
+    ),
+}))
+
+describe("MyComponent", () => {
+    it("renders correctly", () => {
+        render(<MyComponent />)
+        expect(screen.getByText("Hello")).toBeInTheDocument()
+    })
+})
+```
+
+### Test File Locations
+
+| Package | Test Location | Pattern |
+|---------|--------------|---------|
+| `apps/api` | `src/**/*.test.ts` | Unit tests for routes, services |
+| `apps/web` | `src/**/__tests__/*.test.tsx` | Component tests |
+| `packages/core` | `src/**/*.test.ts` | Utility function tests |
+| `packages/testing` | `src/**/*.test.ts` | Self-tests for utilities |
+
+### Using @repo/testing
+
+```typescript
+// Import test utilities
+import { createSpy, sleep, createMockDate } from "@repo/testing"
+
+// Hono helpers
+import { createTestClient, expectJsonResponse } from "@repo/testing/hono"
+
+// React helpers (includes cleanup)
+import { renderWithProviders, userEvent } from "@repo/testing/react"
+```
+
+### Notes
+
+- API tests avoid importing the full app with auth middleware (requires DATABASE_URL)
+- Use `vi.mock()` to mock external dependencies (next/link, auth-client, etc.)
+- PandaCSS `css` function should be mocked in component tests
+
 ## CI/CD (GitHub Actions)
 
 ### Workflows
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| CI | `.github/workflows/ci.yml` | Push/PR to `main` | Lint, Format, Typecheck |
+| CI | `.github/workflows/ci.yml` | Push/PR to `main` | Lint, Format, Typecheck, Test |
 | Deploy | `.github/workflows/deploy.yml` | Push to `main` | CI + CDK Deploy |
 
 ### Local Checks (same as CI)
@@ -575,6 +686,7 @@ For AWS deployment, store in Secrets Manager.
 pnpm lint           # Biome lint
 pnpm format:check   # Biome format check
 pnpm typecheck      # TypeScript check
+pnpm test           # Run all tests
 ```
 
 ### Required GitHub Secrets
