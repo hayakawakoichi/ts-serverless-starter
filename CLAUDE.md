@@ -409,6 +409,96 @@ export default async function ProtectedPage() {
 }
 ```
 
+### Password Reset & Email Verification
+
+Better Auth supports password reset and email verification flows.
+
+**Auth Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/request-password-reset` | POST | Request password reset email |
+| `/api/auth/reset-password` | POST | Set new password with token |
+| `/api/auth/verify-email` | GET | Verify email with token |
+
+**Frontend Pages:**
+
+| Page | Path | Description |
+|------|------|-------------|
+| Forgot Password | `/forgot-password` | Request password reset |
+| Reset Password | `/reset-password` | Set new password (with token) |
+| Verify Email | `/verify-email` | Email verification callback |
+
+**Usage:**
+
+```typescript
+// apps/web/src/lib/auth-client.ts
+import { forgetPassword, resetPassword, sendVerificationEmail } from "@/lib/auth-client";
+
+// Request password reset
+await forgetPassword({
+  email: "user@example.com",
+  redirectTo: "/reset-password",
+});
+
+// Reset password with token
+await resetPassword({
+  newPassword: "newSecurePassword",
+  token: "token-from-url",
+});
+
+// Resend verification email
+await sendVerificationEmail({
+  email: "user@example.com",
+});
+```
+
+### Email Sending (AWS SES)
+
+Email sending is handled by AWS SES via `@repo/core`.
+
+```typescript
+import { sendEmail } from "@repo/core";
+
+await sendEmail({
+  to: "user@example.com",
+  subject: "Subject",
+  text: "Plain text content",
+  html: "<p>HTML content</p>",
+});
+```
+
+**Local Development:**
+
+When `SES_FROM_EMAIL` is not set, emails are logged to the console instead of being sent. The reset URL appears in the server logs for testing.
+
+**Production Setup:**
+
+1. Verify email/domain in AWS SES
+2. Create secret: `aws secretsmanager create-secret --name ts-serverless-starter/ses-from-email --secret-string "noreply@yourdomain.com"`
+3. Request SES sandbox removal for production use
+
+### Shared Auth Schemas
+
+Auth validation schemas are defined in `@repo/core` for consistency across frontend and backend.
+
+```typescript
+// Import directly from @repo/core (both frontend and backend)
+import {
+  AUTH_CONSTANTS,      // { MIN_PASSWORD_LENGTH: 8, MAX_PASSWORD_LENGTH: 128 }
+  emailSchema,         // z.string().email()
+  passwordSchema,      // z.string().min(8).max(128)
+  signInSchema,
+  signUpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  type SignInFormData,
+  type SignUpFormData,
+  type ForgotPasswordFormData,
+  type ResetPasswordFormData,
+} from "@repo/core";
+```
+
 ### Environment Variables
 
 ```bash
@@ -418,6 +508,9 @@ BETTER_AUTH_URL=http://localhost:3000
 
 # For frontend
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# For email sending (optional in local dev)
+SES_FROM_EMAIL=noreply@yourdomain.com
 ```
 
 ## Frontend (PandaCSS)
@@ -487,9 +580,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-// Zod v4 syntax (z.email() instead of z.string().email())
+// Use z.string().email() for proper type inference with react-hook-form
 const schema = z.object({
-  email: z.email({ error: "Invalid email" }),
+  email: z.string().email("Invalid email"),
   password: z.string().min(8, "Min 8 characters"),
 });
 
@@ -520,13 +613,14 @@ function MyForm() {
 
 ### Zod v4 Note
 
-Use new Zod v4 syntax for emails:
+This project uses Zod v4. For email validation with react-hook-form, use `z.string().email()` for proper type inference:
+
 ```typescript
-// Old (deprecated)
+// Recommended (proper type inference with react-hook-form)
 z.string().email("Invalid email")
 
-// New (Zod v4)
-z.email({ error: "Invalid email" })
+// z.email() has type inference issues (infers as 'unknown')
+// z.email({ error: "Invalid email" })  // Avoid with react-hook-form
 ```
 
 ## Key Patterns

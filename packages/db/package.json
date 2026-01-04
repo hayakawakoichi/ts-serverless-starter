@@ -26,6 +26,7 @@
     },
     "dependencies": {
         "@neondatabase/serverless": "^0.10.4",
+        "@repo/core": "workspace:*",
         "better-auth": "^1.4.9",
         "drizzle-orm": "^0.45.1"
     },

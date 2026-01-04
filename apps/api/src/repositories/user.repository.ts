@@ -1,3 +1,4 @@
+import type { BaseFindOptions, PaginatedResult } from "@repo/core"
 import {
     type AuthUser,
     and,
@@ -11,7 +12,6 @@ import {
     or,
     user,
 } from "@repo/db"
-import type { BaseFindOptions, PaginatedResult } from "@repo/core"
 import { getDb } from "../lib/db"
 import type { CreateUserInput, UserSortField } from "../validators"
 

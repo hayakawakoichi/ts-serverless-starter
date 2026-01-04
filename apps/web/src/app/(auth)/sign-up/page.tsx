@@ -1,11 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { type SignUpFormData, signUpSchema } from "@repo/core"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { signUp } from "@/lib/auth-client"
-import { type SignUpFormData, signUpSchema } from "@/lib/schemas/auth"
 import { css } from "../../../../styled-system/css"
 
 export default function SignUpPage() {

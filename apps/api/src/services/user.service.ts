@@ -1,7 +1,7 @@
-import type { AuthUser } from "@repo/db"
 import type { PaginatedResult } from "@repo/core"
+import type { AuthUser } from "@repo/db"
 import { ConflictError, NotFoundError } from "../lib/errors"
-import { userRepository, type UserFindOptions } from "../repositories/user.repository"
+import { type UserFindOptions, userRepository } from "../repositories/user.repository"
 import type { CreateUserInput, UpdateUserInput, UsersListQuery } from "../validators"
 
 export const userService = {

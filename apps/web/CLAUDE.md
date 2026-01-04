@@ -42,9 +42,7 @@ apps/web/
     │   └── auth-status.tsx       # 認証状態表示
     │
     └── lib/                      # ユーティリティ
-        ├── auth-client.ts        # Better Auth (クライアント用)
-        └── schemas/
-            └── auth.ts           # フォームバリデーション (Zod)
+        └── auth-client.ts        # Better Auth (クライアント用)
 ```
 
 ## スタイリング (PandaCSS)
@@ -154,24 +152,18 @@ export const GET = async (request: Request) => {
 
 ### スキーマ定義
 
+Auth スキーマは `@repo/core` で一元管理されています。
+
 ```typescript
-// lib/schemas/auth.ts
-import { z } from "zod";
-
-// Zod v4 構文: z.email() を使用
-export const signInSchema = z.object({
-  email: z.email({ error: "Invalid email format" }),
-  password: z.string().min(1, "Password is required"),
-});
-
-export const signUpSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.email({ error: "Invalid email format" }),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-export type SignInFormData = z.infer<typeof signInSchema>;
-export type SignUpFormData = z.infer<typeof signUpSchema>;
+// @repo/core から直接インポート
+import {
+  signInSchema,
+  signUpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  type SignInFormData,
+  type SignUpFormData,
+} from "@repo/core";
 ```
 
 ### 使用例
@@ -180,7 +172,7 @@ export type SignUpFormData = z.infer<typeof signUpSchema>;
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signInSchema, type SignInFormData } from "@/lib/schemas/auth";
+import { signInSchema, type SignInFormData } from "@repo/core";
 
 export default function SignInPage() {
   const {
@@ -219,12 +211,14 @@ export default function SignInPage() {
 
 ### Zod v4 注意点
 
+react-hook-form との型推論のため、`z.string().email()` を使用:
+
 ```typescript
-// 旧構文（非推奨）
+// 推奨（react-hook-form との型推論が正しく動作）
 z.string().email("Invalid email")
 
-// 新構文（Zod v4）
-z.email({ error: "Invalid email" })
+// z.email() は型が unknown になるため避ける
+// z.email({ error: "Invalid email" })
 ```
 
 ## 認証

@@ -6,7 +6,7 @@
  */
 
 // Re-export vitest utilities for convenience
-export { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from "vitest"
+export { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 
 // Test utilities
 export function createMockDate(isoString: string): Date {

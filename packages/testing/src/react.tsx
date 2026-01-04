@@ -2,10 +2,10 @@
  * React Testing Library utilities
  */
 
-import { cleanup, render, type RenderOptions, type RenderResult } from "@testing-library/react"
+import { cleanup, type RenderOptions, type RenderResult, render } from "@testing-library/react"
 import userEvent, { type UserEvent } from "@testing-library/user-event"
-import { afterEach } from "vitest"
 import type { ReactElement, ReactNode } from "react"
+import { afterEach } from "vitest"
 
 // Cleanup after each test
 afterEach(() => {

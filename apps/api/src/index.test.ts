@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest"
 import { Hono } from "hono"
+import { beforeEach, describe, expect, it } from "vitest"
 import { healthRoutes } from "./routes/health"
 
 // Test the app without auth middleware to avoid DATABASE_URL dependency

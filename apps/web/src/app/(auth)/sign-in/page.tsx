@@ -1,11 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
+import { type SignInFormData, signInSchema } from "@repo/core"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { signIn } from "@/lib/auth-client"
-import { type SignInFormData, signInSchema } from "@/lib/schemas/auth"
 import { css } from "../../../../styled-system/css"
 
 export default function SignInPage() {
@@ -247,6 +247,23 @@ export default function SignInPage() {
                                     {errors.password.message}
                                 </p>
                             )}
+                            <Link
+                                href="/forgot-password"
+                                className={css({
+                                    display: "block",
+                                    marginTop: "0.5rem",
+                                    fontSize: "0.75rem",
+                                    color: "subtle",
+                                    fontFamily: "mono",
+                                    textDecoration: "none",
+                                    textAlign: "right",
+                                    _hover: {
+                                        color: "neonCyan",
+                                    },
+                                })}
+                            >
+                                Forgot password?
+                            </Link>
                         </div>
 
                         <button

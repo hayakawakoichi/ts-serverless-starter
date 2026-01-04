@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { Hono } from "hono"
-import { userRoutes } from "./users"
-import { userService } from "../services/user.service"
 import type { AuthUser } from "@repo/db"
+import { Hono } from "hono"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { userService } from "../services/user.service"
+import { userRoutes } from "./users"
 
 // Mock the user service
 vi.mock("../services/user.service", () => ({

@@ -1,5 +1,5 @@
-import pino from "pino"
 import type { Logger, LoggerOptions } from "pino"
+import pino from "pino"
 import { APP_NAME } from "./constants"
 
 export type { Logger }

@@ -11,6 +11,14 @@
         "./logger": {
             "types": "./src/logger.ts",
             "default": "./src/logger.ts"
+        },
+        "./email": {
+            "types": "./src/email.ts",
+            "default": "./src/email.ts"
+        },
+        "./schemas/auth": {
+            "types": "./src/schemas/auth.ts",
+            "default": "./src/schemas/auth.ts"
         }
     },
     "scripts": {
@@ -28,6 +36,8 @@
         "vitest": "^4.0.16"
     },
     "dependencies": {
-        "pino": "^10.1.0"
+        "@aws-sdk/client-ses": "^3.738.0",
+        "pino": "^10.1.0",
+        "zod": "^4.0.0"
     }
 }

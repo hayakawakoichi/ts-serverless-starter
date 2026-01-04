@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { createMockDate, createMockUUID, sleep, createSpy } from "./index"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { createMockDate, createMockUUID, createSpy, sleep } from "./index"
 
 describe("testing utilities", () => {
     describe("createMockDate", () => {

@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest"
-import { formatDate, generateId, APP_NAME } from "./index"
+import { describe, expect, it } from "vitest"
+import { APP_NAME, formatDate, generateId } from "./index"
 
 describe("core utilities", () => {
     describe("formatDate", () => {

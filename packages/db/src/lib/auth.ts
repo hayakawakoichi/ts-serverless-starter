@@ -1,4 +1,10 @@
 import { neon } from "@neondatabase/serverless"
+import {
+    AUTH_CONSTANTS,
+    getPasswordResetEmailTemplate,
+    getVerificationEmailTemplate,
+    sendEmail,
+} from "@repo/core"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { drizzle } from "drizzle-orm/neon-http"
@@ -26,6 +32,30 @@ export function getAuth() {
             baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
             emailAndPassword: {
                 enabled: true,
+                minPasswordLength: AUTH_CONSTANTS.MIN_PASSWORD_LENGTH,
+                maxPasswordLength: AUTH_CONSTANTS.MAX_PASSWORD_LENGTH,
+                // Password reset email callback
+                // Using void to avoid timing attacks (don't await email sending)
+                sendResetPassword: async ({ user, url }) => {
+                    const template = getPasswordResetEmailTemplate(url, user.name)
+                    void sendEmail({
+                        to: user.email,
+                        ...template,
+                    })
+                },
+            },
+            // Email verification configuration
+            emailVerification: {
+                sendOnSignUp: true, // Auto-send verification email on sign-up
+                autoSignInAfterVerification: true, // Auto sign-in after verification
+                // Using void to avoid timing attacks (don't await email sending)
+                sendVerificationEmail: async ({ user, url }) => {
+                    const template = getVerificationEmailTemplate(url, user.name)
+                    void sendEmail({
+                        to: user.email,
+                        ...template,
+                    })
+                },
             },
             session: {
                 expiresIn: 60 * 60 * 24 * 7, // 7 days

@@ -1,4 +1,5 @@
 import { AuthStatus } from "@/components/auth-status"
+import { EmailVerificationBanner } from "@/components/email-verification-banner"
 import { css } from "../../styled-system/css"
 
 const techStack = [
@@ -128,6 +129,11 @@ export default function Home() {
                 </div>
                 <AuthStatus />
             </header>
+
+            {/* Email Verification Banner */}
+            <div className={css({ padding: "0 2rem", position: "relative", zIndex: 10 })}>
+                <EmailVerificationBanner />
+            </div>
 
             {/* Hero Section */}
             <section
