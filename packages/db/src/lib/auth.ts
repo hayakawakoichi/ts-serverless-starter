@@ -7,7 +7,9 @@ import {
 } from "@repo/core"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { admin } from "better-auth/plugins"
 import { drizzle } from "drizzle-orm/neon-http"
+import { ac, adminRole, roles, userRole } from "../permissions"
 import * as schema from "../schema"
 
 function createAuthDb() {
@@ -65,6 +67,17 @@ export function getAuth() {
                     maxAge: 60 * 5, // 5 minutes
                 },
             },
+            plugins: [
+                admin({
+                    ac,
+                    roles: {
+                        admin: adminRole,
+                        user: userRole,
+                    },
+                    defaultRole: "user",
+                    adminRoles: ["admin"],
+                } as Parameters<typeof admin>[0]),
+            ],
         })
     }
     return _auth

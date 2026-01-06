@@ -15,6 +15,10 @@
         "./auth": {
             "types": "./src/lib/auth.ts",
             "default": "./src/lib/auth.ts"
+        },
+        "./permissions": {
+            "types": "./src/permissions.ts",
+            "default": "./src/permissions.ts"
         }
     },
     "scripts": {

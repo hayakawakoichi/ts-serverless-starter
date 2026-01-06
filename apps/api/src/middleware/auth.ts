@@ -1,10 +1,21 @@
 import { auth } from "@repo/db/auth"
+import { type RoleName, roles } from "@repo/db/permissions"
 import { createMiddleware } from "hono/factory"
 
 type AuthSession = typeof auth.$Infer.Session
 
+/**
+ * Extended user type with role field from Admin Plugin.
+ */
+type UserWithRole = AuthSession["user"] & {
+    role: RoleName
+    banned: boolean | null
+    banReason: string | null
+    banExpires: Date | null
+}
+
 export type AuthVariables = {
-    user: AuthSession["user"] | null
+    user: UserWithRole | null
     session: AuthSession["session"] | null
 }
 
@@ -25,7 +36,7 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(asy
         return
     }
 
-    c.set("user", session.user)
+    c.set("user", session.user as UserWithRole)
     c.set("session", session.session)
     await next()
 })
@@ -71,3 +82,70 @@ export const requireDocsAccess = createMiddleware<{ Variables: AuthVariables }>(
 
     await next()
 })
+
+/**
+ * Middleware factory that requires a specific role.
+ * Returns 401 if not authenticated, 403 if user doesn't have the required role.
+ *
+ * @example
+ * app.use("/admin/*", requireRole("admin"))
+ */
+export function requireRole(role: RoleName) {
+    return createMiddleware<{ Variables: AuthVariables }>(async (c, next) => {
+        const user = c.get("user")
+
+        if (!user) {
+            return c.json({ error: "Unauthorized" }, 401)
+        }
+
+        if (user.role !== role) {
+            return c.json({ error: "Forbidden" }, 403)
+        }
+
+        await next()
+    })
+}
+
+/**
+ * Check if a role has a specific permission.
+ * Uses the roles defined in @repo/db/permissions.
+ */
+function hasPermission(roleName: RoleName, resource: string, action: string): boolean {
+    const role = roles[roleName]
+    if (!role) return false
+
+    const statements = role.statements as Record<string, readonly string[]>
+    const actions = statements[resource]
+    if (!actions) return false
+
+    return actions.includes(action)
+}
+
+/**
+ * Middleware factory that requires a specific permission.
+ * Returns 401 if not authenticated, 403 if user doesn't have the required permission.
+ *
+ * @example
+ * app.delete("/users/:id", requirePermission("user", "delete"), handler)
+ */
+export function requirePermission(resource: string, action: string) {
+    return createMiddleware<{ Variables: AuthVariables }>(async (c, next) => {
+        const user = c.get("user")
+
+        if (!user) {
+            return c.json({ error: "Unauthorized" }, 401)
+        }
+
+        if (!hasPermission(user.role, resource, action)) {
+            return c.json({ error: "Forbidden" }, 403)
+        }
+
+        await next()
+    })
+}
+
+/**
+ * Middleware that requires admin role.
+ * Shorthand for requireRole("admin").
+ */
+export const requireAdmin = requireRole("admin")
