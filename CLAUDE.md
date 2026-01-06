@@ -876,6 +876,7 @@ pnpm test           # Run all tests
 | Secret | Description |
 |--------|-------------|
 | `AWS_ROLE_ARN` | IAM Role ARN for OIDC authentication |
+| `DATABASE_URL` | Neon PostgreSQL connection string (for migrations) |
 
 ### AWS OIDC Setup
 
