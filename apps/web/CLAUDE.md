@@ -6,7 +6,7 @@ Next.js App Router ベースのフロントエンド。Hono API をプロキシ�
 
 | カテゴリ       | 技術                                    |
 | -------------- | --------------------------------------- |
-| フレームワーク | Next.js 15 (App Router)                 |
+| フレームワーク | Next.js 16 (App Router)                 |
 | 言語           | TypeScript, React 19                    |
 | スタイリング   | PandaCSS                                |
 | フォーム       | react-hook-form + zod                   |
