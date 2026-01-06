@@ -20,6 +20,32 @@ export type AuthVariables = {
 }
 
 /**
+ * Check if a user is currently banned.
+ * Returns true if user is banned and ban has not expired.
+ */
+function isUserBanned(user: UserWithRole): boolean {
+    if (!user.banned) return false
+
+    // If banExpires is set and has passed, user is no longer banned
+    if (user.banExpires && new Date() > user.banExpires) {
+        return false
+    }
+
+    return true
+}
+
+/**
+ * Create a ban error response with details.
+ */
+function createBanResponse(user: UserWithRole) {
+    return {
+        error: "User is banned",
+        reason: user.banReason,
+        expiresAt: user.banExpires?.toISOString() ?? null,
+    }
+}
+
+/**
  * Authentication middleware that extracts session from request headers.
  * Sets `user` and `session` in context variables.
  * Does NOT block requests - use `requireAuth` for protected routes.
@@ -44,12 +70,17 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(asy
 /**
  * Middleware that requires authentication.
  * Returns 401 if user is not authenticated.
+ * Returns 403 if user is banned.
  */
 export const requireAuth = createMiddleware<{ Variables: AuthVariables }>(async (c, next) => {
     const user = c.get("user")
 
     if (!user) {
         return c.json({ error: "Unauthorized" }, 401)
+    }
+
+    if (isUserBanned(user)) {
+        return c.json(createBanResponse(user), 403)
     }
 
     await next()
@@ -85,7 +116,7 @@ export const requireDocsAccess = createMiddleware<{ Variables: AuthVariables }>(
 
 /**
  * Middleware factory that requires a specific role.
- * Returns 401 if not authenticated, 403 if user doesn't have the required role.
+ * Returns 401 if not authenticated, 403 if user is banned or doesn't have the required role.
  *
  * @example
  * app.use("/admin/*", requireRole("admin"))
@@ -96,6 +127,10 @@ export function requireRole(role: RoleName) {
 
         if (!user) {
             return c.json({ error: "Unauthorized" }, 401)
+        }
+
+        if (isUserBanned(user)) {
+            return c.json(createBanResponse(user), 403)
         }
 
         if (user.role !== role) {
@@ -123,7 +158,7 @@ function hasPermission(roleName: RoleName, resource: string, action: string): bo
 
 /**
  * Middleware factory that requires a specific permission.
- * Returns 401 if not authenticated, 403 if user doesn't have the required permission.
+ * Returns 401 if not authenticated, 403 if user is banned or doesn't have the required permission.
  *
  * @example
  * app.delete("/users/:id", requirePermission("user", "delete"), handler)
@@ -134,6 +169,10 @@ export function requirePermission(resource: string, action: string) {
 
         if (!user) {
             return c.json({ error: "Unauthorized" }, 401)
+        }
+
+        if (isUserBanned(user)) {
+            return c.json(createBanResponse(user), 403)
         }
 
         if (!hasPermission(user.role, resource, action)) {
