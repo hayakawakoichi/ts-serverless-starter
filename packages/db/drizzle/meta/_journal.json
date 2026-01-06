@@ -5,19 +5,12 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1767018191606,
-      "tag": "0000_clear_susan_delgado",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
       "when": 1735545600000,
       "tag": "0001_drop_users_add_auth",
       "breakpoints": true
     },
     {
-      "idx": 2,
+      "idx": 1,
       "version": "7",
       "when": 1736163600000,
       "tag": "0002_add_role_and_ban_columns",
