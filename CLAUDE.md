@@ -409,6 +409,94 @@ export default async function ProtectedPage() {
 }
 ```
 
+### Role-Based Access Control (RBAC)
+
+Better Auth Admin Plugin provides role-based permission management.
+
+**Available Roles:**
+
+| Role | Description |
+|------|-------------|
+| `user` | Default role for new users. Limited permissions. |
+| `admin` | Full administrative permissions. Can manage users, ban, impersonate, etc. |
+
+**User Schema Fields:**
+
+```typescript
+// packages/db/src/schema/auth.ts
+user: {
+  // ... existing fields
+  role: text("role").notNull().default("user"),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
+}
+```
+
+**Permission Definitions:**
+
+```typescript
+// packages/db/src/permissions.ts
+import { createAccessControl } from "better-auth/plugins/access"
+import { adminAc, defaultStatements } from "better-auth/plugins/admin/access"
+
+export const statement = {
+    ...defaultStatements,
+    // Add custom resources here:
+    // project: ["create", "read", "update", "delete"],
+} as const
+
+export const ac = createAccessControl(statement)
+
+export const userRole = ac.newRole({
+    // Users have no admin permissions by default
+})
+
+export const adminRole = ac.newRole({
+    ...adminAc.statements,
+})
+```
+
+**API Middleware Usage:**
+
+```typescript
+// apps/api/src/middleware/auth.ts
+import { requireRole, requireAdmin, requirePermission } from "../middleware/auth"
+
+// Require specific role
+app.use("/admin/*", requireRole("admin"))
+
+// Shorthand for admin role
+app.use("/admin/*", requireAdmin)
+
+// Require specific permission (if custom permissions defined)
+app.delete("/users/:id", requirePermission("user", "delete"), handler)
+```
+
+**Checking Role in Route Handlers:**
+
+```typescript
+app.get("/api/example", (c) => {
+  const user = c.get("user")
+
+  if (user?.role === "admin") {
+    // Admin-specific logic
+  }
+
+  return c.json({ data })
+})
+```
+
+**Client-Side Role Check:**
+
+```typescript
+const { data: session } = useSession()
+
+if (session?.user?.role === "admin") {
+  // Show admin UI
+}
+```
+
 ### Password Reset & Email Verification
 
 Better Auth supports password reset and email verification flows.
@@ -788,6 +876,7 @@ pnpm test           # Run all tests
 | Secret | Description |
 |--------|-------------|
 | `AWS_ROLE_ARN` | IAM Role ARN for OIDC authentication |
+| `DATABASE_URL` | Neon PostgreSQL connection string (for migrations) |
 
 ### AWS OIDC Setup
 
