@@ -4,7 +4,7 @@ import { css } from "../../styled-system/css"
 
 const techStack = [
     {
-        name: "Next.js 15",
+        name: "Next.js 16",
         description: "App Router + React 19",
         icon: "N",
         color: "#00ffff",
