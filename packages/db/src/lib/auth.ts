@@ -97,3 +97,21 @@ export const auth = {
 }
 
 export type Auth = ReturnType<typeof getAuth>
+
+/**
+ * User type with Admin Plugin fields.
+ * Exported for use in middleware and other places that need typed user access.
+ */
+export type AuthUser = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image: string | null
+    createdAt: Date
+    updatedAt: Date
+    role: "user" | "admin"
+    banned: boolean | null
+    banReason: string | null
+    banExpires: Date | null
+}

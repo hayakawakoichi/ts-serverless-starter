@@ -1,21 +1,11 @@
-import { auth } from "@repo/db/auth"
+import { type AuthUser, auth } from "@repo/db/auth"
 import { type RoleName, roles } from "@repo/db/permissions"
 import { createMiddleware } from "hono/factory"
 
 type AuthSession = typeof auth.$Infer.Session
 
-/**
- * Extended user type with role field from Admin Plugin.
- */
-type UserWithRole = AuthSession["user"] & {
-    role: RoleName
-    banned: boolean | null
-    banReason: string | null
-    banExpires: Date | null
-}
-
 export type AuthVariables = {
-    user: UserWithRole | null
+    user: AuthUser | null
     session: AuthSession["session"] | null
 }
 
@@ -23,7 +13,7 @@ export type AuthVariables = {
  * Check if a user is currently banned.
  * Returns true if user is banned and ban has not expired.
  */
-function isUserBanned(user: UserWithRole): boolean {
+function isUserBanned(user: AuthUser): boolean {
     if (!user.banned) return false
 
     // If banExpires is set and has passed, user is no longer banned
@@ -37,7 +27,7 @@ function isUserBanned(user: UserWithRole): boolean {
 /**
  * Create a ban error response with details.
  */
-function createBanResponse(user: UserWithRole) {
+function createBanResponse(user: AuthUser) {
     return {
         error: "User is banned",
         reason: user.banReason,
@@ -62,7 +52,7 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(asy
         return
     }
 
-    c.set("user", session.user as UserWithRole)
+    c.set("user", session.user as AuthUser)
     c.set("session", session.session)
     await next()
 })
